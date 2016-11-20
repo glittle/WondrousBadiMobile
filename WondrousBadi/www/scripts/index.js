@@ -12,20 +12,16 @@
     document.addEventListener('pause', onPause.bind(this), false);
     document.addEventListener('resume', onResume.bind(this), false);
 
-    sharedStartup();
-
-    //$('#get-times-btn').click(getWeatherWithZipCode);
-
-    navigator.geolocation.getCurrentPosition(onGetLocationSuccess, onGetLocationError,
-      { enableHighAccuracy: false });
-    $('#error-msg').show();
-    $('#error-msg').text('Determining your current location ...');
+    sharedStartup(onReady);
   }
 
-  function onGetLocationSuccess(position) {
-    //Retrieve the location information from the position object
-    var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
+  function onReady() {
+    showTimes();
+  }
+
+  function showTimes() {
+    var latitude = _locationLat;
+    var longitude = _locationLong;
 
     var readableFormat = 'MMMM D [at] HH:mm';
     var answers = [];
@@ -37,6 +33,9 @@
     var sun1 = sunCalc.getTimes(noon, latitude, longitude);
     var sunrise1 = moment(sun1.sunrise);
     var sunset1 = moment(sun1.sunset);
+
+
+    answers.push({ v:'', t: 'Today is the {bDayOrdinal} of {bMonthNamePri}, {bYear}'.filledWith(_di) });
 
     if (now.isAfter(sunset1)) {
       // eve of day1 into day2
@@ -76,12 +75,6 @@
       }))
       .show();
   }
-
-  function onGetLocationError(error) {
-    $('#error-msg').text('Error getting location');
-    $('#get-times-btn').prop('disabled', false);
-  }
-
 
 
   function onPause() {

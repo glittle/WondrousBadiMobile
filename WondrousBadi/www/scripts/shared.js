@@ -5,7 +5,7 @@ var _cachedMessages = {};
 var _cachedMessageUseCount = 0;
 
 var settings = {
-  useArNames: true,
+  useArNames: false,
   rememberFocusTimeMinutes: 5, // show on settings page?
   optedOutOfGoogleAnalytics: getStorage('optOutGa', -1),
   //  integrateIntoGoogleCalendar: getStorage('enableGCal', true),
@@ -20,10 +20,13 @@ var holyDays = HolyDays();
 var knownDateInfos = {};
 var _di = {};
 var _initialDiStamp;
+var _focusTime;
+var _locationLat = 0;
+var _locationLong = 0;
 
 var lists = {};
 
-settings.useArNames = getStorage('useArNames', true);
+settings.useArNames = getStorage('useArNames', false);
 
 var use24HourClock = false;
 
@@ -52,6 +55,12 @@ function onLocaleLoaded() {
   lists.ordinal = getMessage('ordinal').split(splitSeparator);
   lists.ordinalNames = getMessage('ordinalNames').split(splitSeparator);
   lists.elements = getMessage('elements').split(splitSeparator);
+
+  refreshDateInfo();
+
+  if (_onReadyFn) {
+    _onReadyFn();
+  }
 }
 
 function setupLanguageChoice() {
@@ -103,8 +112,8 @@ function getDateInfo(currentTime, onlyStamp) {
   var frag2Noon = new Date(frag1Noon.getTime());
   frag2Noon.setDate(frag2Noon.getDate() + 1);
 
-  var frag1SunTimes = sunCalculator.getTimes(frag1Noon, _locationLat, _locationLong);
-  var frag2SunTimes = sunCalculator.getTimes(frag2Noon, _locationLat, _locationLong);
+  var frag1SunTimes = sunCalc.getTimes(frag1Noon, _locationLat, _locationLong);
+  var frag2SunTimes = sunCalc.getTimes(frag2Noon, _locationLat, _locationLong);
 
   var di = { // date info
     frag1: frag1Noon,
@@ -145,10 +154,10 @@ function getDateInfo(currentTime, onlyStamp) {
     bVahid: Math.floor(1 + (bNow.y - 1) / 19),
     bDateCode: bNow.m + '.' + bNow.d,
 
-    bDayNameAr: bMonthNameAr[bNow.d],
-    bDayMeaning: bMonthMeaning[bNow.d],
-    bMonthNameAr: bMonthNameAr[bNow.m],
-    bMonthMeaning: bMonthMeaning[bNow.m],
+    bDayNameAr: lists.bMonthNameAr[bNow.d],
+    bDayMeaning: lists.bMonthMeaning[bNow.d],
+    bMonthNameAr: lists.bMonthNameAr[bNow.m],
+    bMonthMeaning: lists.bMonthMeaning[bNow.m],
 
     bEraLong: getMessage('eraLong'),
     bEraAbbrev: getMessage('eraAbbrev'),
@@ -162,28 +171,28 @@ function getDateInfo(currentTime, onlyStamp) {
   di.bMonthNamePri = settings.useArNames ? di.bMonthNameAr : di.bMonthMeaning;
   di.bMonthNameSec = !settings.useArNames ? di.bMonthNameAr : di.bMonthMeaning;
 
-  di.VahidLabelPri = settings.useArNames ? getMessage('vahid') : getMessage('vahidLocal');
-  di.VahidLabelSec = !settings.useArNames ? getMessage('vahid') : getMessage('vahidLocal');
+  di.VahidLabelPri = settings.useArNames ? getMessage('Vahid') : getMessage('VahidLocal');
+  di.VahidLabelSec = !settings.useArNames ? getMessage('Vahid') : getMessage('VahidLocal');
 
-  di.KullishayLabelPri = settings.useArNames ? getMessage('kullishay') : getMessage('kullishayLocal');
-  di.KullishayLabelSec = !settings.useArNames ? getMessage('kullishay') : getMessage('kullishayLocal');
+  di.KullishayLabelPri = settings.useArNames ? getMessage('Kullishay') : getMessage('KullishayLocal');
+  di.KullishayLabelSec = !settings.useArNames ? getMessage('Kullishay') : getMessage('KullishayLocal');
 
   di.bKullishay = Math.floor(1 + (di.bVahid - 1) / 19);
   di.bVahid = di.bVahid - (di.bKullishay - 1) * 19;
   di.bYearInVahid = di.bYear - (di.bVahid - 1) * 19 - (di.bKullishay - 1) * 19 * 19;
 
-  di.bYearInVahidNameAr = bYearInVahidNameAr[di.bYearInVahid];
-  di.bYearInVahidMeaning = bYearInVahidMeaning[di.bYearInVahid];
+  di.bYearInVahidNameAr = lists.bYearInVahidNameAr[di.bYearInVahid];
+  di.bYearInVahidMeaning = lists.bYearInVahidMeaning[di.bYearInVahid];
   di.bYearInVahidNamePri = settings.useArNames ? di.bYearInVahidNameAr : di.bYearInVahidMeaning;
   di.bYearInVahidNameSec = !settings.useArNames ? di.bYearInVahidNameAr : di.bYearInVahidMeaning;
 
-  di.bWeekdayNameAr = bWeekdayNameAr[di.bWeekday];
-  di.bWeekdayMeaning = bWeekdayMeaning[di.bWeekday];
+  di.bWeekdayNameAr = lists.bWeekdayNameAr[di.bWeekday];
+  di.bWeekdayMeaning = lists.bWeekdayMeaning[di.bWeekday];
   di.bWeekdayNamePri = settings.useArNames ? di.bWeekdayNameAr : di.bWeekdayMeaning;
   di.bWeekdayNameSec = !settings.useArNames ? di.bWeekdayNameAr : di.bWeekdayMeaning;
 
   di.elementNum = getElementNum(bNow.m);
-  di.element = elements[di.elementNum - 1];
+  di.element = lists.elements[di.elementNum - 1];
 
   di.bDayOrdinal = di.bDay + getOrdinal(di.bDay);
   di.bVahidOrdinal = di.bVahid + getOrdinal(di.bVahid);
@@ -206,20 +215,20 @@ function getDateInfo(currentTime, onlyStamp) {
   di.endingSunsetDesc = use24HourClock ? di.endingSunsetDesc24 : di.endingSunsetDesc12;
   di.sunriseDesc = use24HourClock ? di.sunriseDesc24 : di.sunriseDesc12;
 
-  di.frag1MonthLong = gMonthLong[di.frag1Month];
-  di.frag1MonthShort = gMonthShort[di.frag1Month];
-  di.frag1WeekdayLong = gWeekdayLong[di.frag1Weekday];
-  di.frag1WeekdayShort = gWeekdayShort[di.frag1Weekday];
+  di.frag1MonthLong = lists.gMonthLong[di.frag1Month];
+  di.frag1MonthShort = lists.gMonthShort[di.frag1Month];
+  di.frag1WeekdayLong = lists.gWeekdayLong[di.frag1Weekday];
+  di.frag1WeekdayShort = lists.gWeekdayShort[di.frag1Weekday];
 
-  di.frag2MonthLong = gMonthLong[di.frag2Month];
-  di.frag2MonthShort = gMonthShort[di.frag2Month];
-  di.frag2WeekdayLong = gWeekdayLong[di.frag2Weekday];
-  di.frag2WeekdayShort = gWeekdayShort[di.frag2Weekday];
+  di.frag2MonthLong = lists.gMonthLong[di.frag2Month];
+  di.frag2MonthShort = lists.gMonthShort[di.frag2Month];
+  di.frag2WeekdayLong = lists.gWeekdayLong[di.frag2Weekday];
+  di.frag2WeekdayShort = lists.gWeekdayShort[di.frag2Weekday];
 
-  di.currentMonthLong = gMonthLong[di.currentMonth];
-  di.currentMonthShort = gMonthShort[di.currentMonth];
-  di.currentWeekdayLong = gWeekdayLong[di.currentWeekday];
-  di.currentWeekdayShort = gWeekdayShort[di.currentWeekday];
+  di.currentMonthLong = lists.gMonthLong[di.currentMonth];
+  di.currentMonthShort = lists.gMonthShort[di.currentMonth];
+  di.currentWeekdayLong = lists.gWeekdayLong[di.currentWeekday];
+  di.currentWeekdayShort = lists.gWeekdayShort[di.currentWeekday];
   di.currentDateString = moment(di.currentTime).format('YYYY-MM-DD');
 
 
@@ -282,6 +291,28 @@ function getElementNum(num) {
 }
 
 
+function getFocusTime() {
+  if (!_focusTime) {
+    _focusTime = new Date();
+  }
+
+  if (isNaN(_focusTime)) {
+    log('unexpected 1: ', _focusTime);
+    _focusTime = new Date();
+  }
+
+  return _focusTime;
+}
+
+function setFocusTime(t) {
+  _focusTime = t;
+  if (isNaN(_focusTime)) {
+    log('unexpected 2: ', _focusTime);
+  }
+  setStorage('focusTime', t.getTime());
+  setStorage('focusTimeAsOf', new Date().getTime());
+
+}
 
 
 
@@ -489,9 +520,84 @@ function getMessage(key, obj, defaultValue) {
 
 }
 
+function digitPad2(num) {
+  return ('00' + num).slice(-2);
+}
+
+function getOrdinal(num) {
+  return lists.ordinal[num] || lists.ordinal[0] || num;
+}
+
+function getOrdinalName(num) {
+  return lists.ordinalNames[num] || num;
+}
+
+
+function determineDaysAway(di, moment1, moment2, sameDay) {
+  var days = moment2.diff(moment1, 'days');
+  if (days === 1 && !di.bNow.eve) {
+    return getMessage('Tonight');
+  }
+  if (days === -1) {
+    return getMessage('Ended');
+  }
+  if (days === 0) {
+    return getMessage('Now');
+  }
+  return getMessage(days === 1 ? '1day' : 'otherDays').filledWith(days);
+}
+
+
+function showTime(d, use24) {
+  var hoursType = use24HourClock || (use24 === 24) ? 24 : 0;
+  var show24Hour = hoursType === 24;
+  var hours24 = d.getHours();
+  var pm = hours24 >= 12;
+  var hours = show24Hour
+    ? hours24
+    : hours24 > 12
+      ? hours24 - 12
+      : hours24 === 0
+        ? 12
+        : hours24;
+  var minutes = d.getMinutes();
+  var time = hours + ':' + ('0' + minutes).slice(-2);
+  if (!show24Hour) {
+    if (hours24 === 12 && minutes === 0) {
+      time = getMessage('noon');
+    } else if (hours24 === 0 && minutes === 0) {
+      time = getMessage('midnight');
+    } else {
+      time = getMessage('timeFormat12')
+        .filledWith({
+          time: time,
+          ampm: pm ? getMessage('pm') : getMessage('am')
+        });
+    }
+  }
+  return time;
+};
+
+
+var findName = function (typeName, results, getLastMatch) {
+  var match = null;
+  for (var r = 0; r < results.length; r++) {
+    var result = results[r];
+    if (result.types.indexOf(typeName) !== -1) {
+      match = result.formatted_address;
+      if (!getLastMatch) return match;
+    }
+  }
+  return match;
+};
+
 
 function getRawMessage(key) {
-  return _localeMessages[key] || '';
+  var raw = _localeMessages[key];
+  if (raw) {
+    return raw.message || '';
+  }
+  return '';
 }
 
 function loadLocaleInfo() {
@@ -508,6 +614,18 @@ function readFile(locale, fn) {
   return $.getJSON(`locales/${locale}/messages.json`);
 }
 
-function sharedStartup() {
+var _onReadyFn;
+
+function sharedStartup(fn) {
+  _onReadyFn = fn;
+
+  //TODO chain as a promise
+  navigator.geolocation.getCurrentPosition(function (position) {
+    _locationLat = position.coords.latitude;
+    _locationLong = position.coords.longitude;
+  }, function (err) {
+    console.log(err);
+  }, { enableHighAccuracy: false });
+
   loadLocaleInfo();
 }
