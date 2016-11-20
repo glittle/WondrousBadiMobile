@@ -629,3 +629,12 @@ function sharedStartup(fn) {
 
   loadLocaleInfo();
 }
+
+function popupNotification(msg) {
+  navigator.notification.alert(
+    msg,  // message
+    function () { },         // callback
+    'Wondrous Calendar',            // title
+    'Done'                  // buttonName
+  );
+}

@@ -16,10 +16,15 @@
   }
 
   function onReady() {
-    showTimes();
+
+    var today = 'Today is the {bDayOrdinal} of {bMonthNamePri}, {bYear}'.filledWith(_di);
+
+    showTimes(today);
+
+    popupNotification(today);
   }
 
-  function showTimes() {
+  function showTimes(today) {
     var latitude = _locationLat;
     var longitude = _locationLong;
 
@@ -35,7 +40,7 @@
     var sunset1 = moment(sun1.sunset);
 
 
-    answers.push({ v:'', t: 'Today is the {bDayOrdinal} of {bMonthNamePri}, {bYear}'.filledWith(_di) });
+    answers.push({ v: '', t: today });
 
     if (now.isAfter(sunset1)) {
       // eve of day1 into day2

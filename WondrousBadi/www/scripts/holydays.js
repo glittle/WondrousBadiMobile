@@ -390,9 +390,9 @@ var HolyDays = function () {
         break;
     }
 
-    //    if (typeof sunCalculator != 'undefined') {
+    //    if (typeof sunCalc != 'undefined') {
     //      var eveSunset = new Date(answer);
-    //      answer = sunCalculator.getTimes(eveSunset, _locationLat, _locationLong).sunset;
+    //      answer = sunCalc.getTimes(eveSunset, _locationLat, _locationLong).sunset;
     //    }
 
     // answer has no time, and is for the frag2 part of the Badi day
@@ -411,11 +411,11 @@ var HolyDays = function () {
 
   var getBDate = function (gSourceDate) {
     var sourceDate = new Date(gSourceDate);
-    var sunCalcReady = typeof sunCalculator !== 'undefined';
+    var sunCalcReady = typeof sunCalc !== 'undefined';
     var pmSunset = new Date(sourceDate);
     if (sunCalcReady) {
       pmSunset.setHours(12);
-      pmSunset = sunCalculator.getTimes(pmSunset, _locationLat, _locationLong).sunset;
+      pmSunset = sunCalc.getTimes(pmSunset, _locationLat, _locationLong).sunset;
     }
     //    else {
     //      log('unknown sunset - ' + sunCalcReady + ' ' + latReady);
@@ -2167,8 +2167,8 @@ var HolyDays = function () {
     }
 
     var eveSunset = new Date(nawRuz);
-    if (typeof sunCalculator != 'undefined') {
-      nawRuz = sunCalculator.getTimes(eveSunset, _locationLat, _locationLong).sunset;
+    if (typeof sunCalc != 'undefined') {
+      nawRuz = sunCalc.getTimes(eveSunset, _locationLat, _locationLong).sunset;
     } else {
       // default to 6:30pm
       eveSunset.setHours(18, 30, 0, 0);
