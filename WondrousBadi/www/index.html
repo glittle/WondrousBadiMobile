@@ -21,24 +21,28 @@
   <div data-role="page" id="wondrous-home">
 
     <div data-role="header" class="header">
-      <h1 id="app-title">Wondrous-Badí' Caleendar</h1>
-      <a href="/" 
+      <h1 id="app-title">Wondrous-Badí' Calendar</h1>
+      <a href="index.html" 
          class="ui-btn ui-btn-left ui-btn-corner-all ui-icon-home ui-btn-icon-notext" 
          rel="external">Home</a>
     </div>
 
     <div role="main" class="ui-content">
 
-      <ul id="times-data" 
-          data-role="listview" 
-          data-inset="true" 
-          class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
-        <li data-role="list-divider" id="title" class="ui-li-divider ui-bar-a"></li>
-      </ul>
+      <div id="day-data"
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+      </div>
+      <div id="times-data"
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+      </div>
+      <div id="where-data"
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+      </div>
 
       <div id="error-msg" class="not-displayed">
       </div>
 
+      <button type="button" id="btnRefresh">Refresh</button>
     </div>
 
     <footer data-role="footer" data-position="fixed">

@@ -621,20 +621,13 @@ function sharedStartup(fn) {
 
   //TODO chain as a promise
   navigator.geolocation.getCurrentPosition(function (position) {
+    console.log('location known');
     _locationLat = position.coords.latitude;
     _locationLong = position.coords.longitude;
+
+    loadLocaleInfo();
   }, function (err) {
     console.log(err);
   }, { enableHighAccuracy: false });
 
-  loadLocaleInfo();
-}
-
-function popupNotification(msg) {
-  navigator.notification.alert(
-    msg,  // message
-    function () { },         // callback
-    'Wondrous Calendar',            // title
-    'Done'                  // buttonName
-  );
 }

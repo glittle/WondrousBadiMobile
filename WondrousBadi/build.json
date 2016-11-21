@@ -1,11 +1,11 @@
 {
      "android": {
-         "release": {
-             "keystore": "",
-             "storePassword": "",
-             "alias": "",
-             "password" : "",
-             "keystoreType": ""
-         }
+      "release": {
+        "keystore": "C:\\Users\\glen\\Source\\Projects\\wondrousBadiMobile1.keystore",
+        "storePassword": "23j3jj2j3j_234",
+        "alias": "glenLittle",
+        "password": "23j3jj2j3j_234",
+        "keystoreType": ""
+      }
      }
  }

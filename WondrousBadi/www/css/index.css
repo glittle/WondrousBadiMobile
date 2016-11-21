@@ -2,15 +2,6 @@
   display: none;
 }
 
-form {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-}
-
-#get-weather-btn {
-  font-size: 22px;
-}
-
 #title {
   font-size: 16px;
 }
@@ -27,4 +18,25 @@ form {
   text-align: center;
   margin-top: 50%;
   font-weight: bold;
+}
+
+.ui-listview > div {
+  padding: .3em 1em;
+}
+
+  .ui-listview > div > span {
+    float: right;
+  }
+
+.ui-listview .ui-li-divider {
+  text-align: center;
+}
+
+#btnRefresh {
+  display: none;
+}
+
+.ui-header .ui-title {
+  margin: 0;
+  /* font-size: 1.25em; */
 }
