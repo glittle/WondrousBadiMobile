@@ -292,29 +292,43 @@ function getElementNum(num) {
 
 
 function getFocusTime() {
-  if (!_focusTime) {
-    _focusTime = new Date();
-  }
-
-  if (isNaN(_focusTime)) {
-    log('unexpected 1: ', _focusTime);
-    _focusTime = new Date();
-  }
-
-  return _focusTime;
+  return new Date();
+//  if (!_focusTime) {
+//    _focusTime = new Date();
+//  }
+//
+//  if (isNaN(_focusTime)) {
+//    log('unexpected 1: ', _focusTime);
+//    _focusTime = new Date();
+//  }
+//
+//  return _focusTime;
 }
 
-function setFocusTime(t) {
-  _focusTime = t;
-  if (isNaN(_focusTime)) {
-    log('unexpected 2: ', _focusTime);
+//function setFocusTime(t) {
+//  _focusTime = t || (t = new Date());
+//  if (isNaN(_focusTime)) {
+//    log('unexpected 2: ', _focusTime);
+//  }
+//  setStorage('focusTime', t.getTime());
+//  setStorage('focusTimeAsOf', new Date().getTime());
+//
+//}
+
+function log() {
+  // add a timestamp to console log entries
+  //  var a = ['%c'];
+  //  a.push('display: block; text-align: right;');
+  //  a.push(new moment().format('DD H:mm:ss'));
+  //  a.push('\n');
+  var a = ['\n'];
+  for (var x in log.arguments) {
+    if (log.arguments.hasOwnProperty(x)) {
+      a.push(log.arguments[x]);
+    }
   }
-  setStorage('focusTime', t.getTime());
-  setStorage('focusTimeAsOf', new Date().getTime());
-
+  console.log.apply(console, a);
 }
-
-
 
 
 
@@ -621,7 +635,6 @@ function sharedStartup(fn) {
 
   //TODO chain as a promise
   navigator.geolocation.getCurrentPosition(function (position) {
-    console.log('location known');
     _locationLat = position.coords.latitude;
     _locationLong = position.coords.longitude;
 

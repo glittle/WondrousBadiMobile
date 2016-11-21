@@ -5,7 +5,10 @@
 (function () {
   "use strict";
 
-  document.addEventListener('deviceready', onDeviceReady.bind(this), false);
+  var settings = {
+    refreshTimeout: null
+  }
+
 
   function onDeviceReady() {
     // Handle the Cordova pause and resume events
@@ -15,9 +18,18 @@
     cordova.plugins.notification.local.registerPermission(function (granted) {
     });
 
-    sharedStartup(onReady);
+//    chrome.alarms.onAlarm.addListener(function (alarm) {
+//      log("Received alarm: " + alarm.name + '. Creating notification.');
+//      refreshDateInfo();
+//      show();
+//    });
 
+    renderUi();
     attachHandlers();
+  }
+
+  function renderUi() {
+    sharedStartup(onReady);
   }
 
   function attachHandlers() {
@@ -43,11 +55,23 @@
       title: '{bDay} {bMonthNamePri} {bYear}'.filledWith(_di),
       text: '{nearestSunset}'.filledWith(_di),
       // at: new Date(new Date().getTime() + 100) -- NOW!
-      badge: _di.bDay,
-      icon: 'res://Badi19',
+      //badge: _di.bDay,
+      icon: 'file://images/Badi19-96.png', //?? not working
       ongoing: true
     });
-}
+  }
+
+  function setNextRefreshAt(m) {
+  //  chrome.alarms.create('refresh', { when: m.valueOf() });
+    var ms = m.diff(moment());
+    console.log('timeout in ' + ms);
+    clearTimeout(settings.refreshTimeout);
+    settings.refreshTimeout = setTimeout(function () {
+      refreshDateInfo();
+      doNotification();
+      show(); // will set next timeout
+    }, ms);
+  }
 
   function showAnswers(selector, answers) {
     $(selector)
@@ -57,7 +81,8 @@
       .show();
   }
 
-  function showTimes(today) {
+
+  function showTimes() {
     var latitude = _locationLat;
     var longitude = _locationLong;
 
@@ -77,6 +102,8 @@
     answers.push({ t: 'Day of Month', v: '{bDay} / {bDayNamePri} / {bDayNameSec}'.filledWith(_di) });
     answers.push({ t: 'Month', v: '{bMonth} / {bMonthNamePri} / {bMonthNameSec}'.filledWith(_di) });
     answers.push({ t: 'Day of Week', v: '{bWeekday} / {bWeekdayNamePri} / {bWeekdayNameSec} / {currentWeekdayShort}'.filledWith(_di) });
+    answers.push({ t: 'Element of Year', v: '{element}'.filledWith(_di) });
+    answers.push({ t: 'Year', v: '{bYear} / Year {bYearInVahid} of Vahid {bVahid}'.filledWith(_di) });
 
     showAnswers('#day-data', answers);
 
@@ -98,6 +125,8 @@
         answers.push({ t: `Now:`, v: now.format(readableFormat) });
       }
       answers.push({ t: `Day will end at sunset:`, v: sunset2.format(readableFormat) });
+
+      setNextRefreshAt(sunset2);
     } else {
       // get prior sunset
       var sun0 = sunCalc.getTimes(moment(noon).subtract(24, 'hours'), latitude, longitude);
@@ -112,6 +141,8 @@
         answers.push({ t: `Now:`, v: now.format(readableFormat) });
       }
       answers.push({ t: `Day will end at sunset:`, v: sunset1.format(readableFormat) });
+
+      setNextRefreshAt(sunset1);
     }
 
 
@@ -131,6 +162,9 @@
 
   function onResume() {
     // TODO: This application has been reactivated. Restore application state here.
-    // update the time!
+    renderUi();
   }
+
+  document.addEventListener('deviceready', onDeviceReady);
+
 })();

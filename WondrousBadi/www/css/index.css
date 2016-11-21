@@ -20,17 +20,27 @@
   font-weight: bold;
 }
 
-.ui-listview > div {
-  padding: .3em 1em;
+.ui-header {
+  background: url(../images/Badi19-96.png) no-repeat 2px center;
+  background-size: contain;
 }
 
-  .ui-listview > div > span {
-    float: right;
+.ui-listview {
+  overflow: auto;
+}
+
+  .ui-listview > div {
+    padding: .3em 1em;
+    overflow: auto;
   }
 
-.ui-listview .ui-li-divider {
-  text-align: center;
-}
+    .ui-listview > div > span {
+      float: right;
+    }
+
+  .ui-listview .ui-li-divider {
+    text-align: center;
+  }
 
 #btnRefresh {
   display: none;
