@@ -27,26 +27,52 @@
 
 .ui-listview {
   overflow: auto;
+  max-width: 30em;
 }
 
-  .ui-listview > div {
-    padding: .3em 1em;
-    overflow: auto;
+.ui-btn {
+  /* max-width: 30em; */
+}
+
+div.line {
+  margin: 3px 1em;
+  overflow: auto;
+}
+
+  div.line label {
+    display: inline;
+    float: left;
+    margin: 0;
+    /* color: #666; */
   }
 
-    .ui-listview > div > span {
-      float: right;
-    }
-
-  .ui-listview .ui-li-divider {
-    text-align: center;
+  div.line span {
+    float: right;
   }
 
-#btnRefresh {
+  div.line.now {
+    color: #aaa;
+  }
+
+.ui-listview .ui-li-divider {
+  text-align: center;
+}
+
+  .ui-listview .ui-li-divider label {
+    float: none;
+    color: #000;
+  }
+
+#btnRefresh; {
   display: none;
 }
 
 .ui-header .ui-title {
   margin: 0;
   /* font-size: 1.25em; */
+}
+
+#log {
+  font-size: 9px;
+  color: #666;
 }

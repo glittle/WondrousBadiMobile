@@ -1,10 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <!--
-      Customize the content security policy in the meta tag below as needed. Add 'unsafe-inline' to default-src to enable inline JavaScript.
-      For details, see http://go.microsoft.com/fwlink/?LinkID=617521
-  -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
 
   <title>Wondrous-Badí'</title>
@@ -15,10 +11,11 @@
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
   <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
   <link rel="stylesheet" type="text/css" href="css/index.css">
+  <script type="text/javascript" src="scripts/index.js"></script>
 </head>
 <body>
 
-  <div data-role="page" id="wondrous-home">
+  <div data-role="page" class="page" id="wondrous-home">
 
     <div data-role="header" class="header">
       <h1 id="app-title">Wondrous-Badí' Calendar</h1>
@@ -27,19 +24,26 @@
     <div role="main" class="ui-content">
 
       <div id="day-data"
-           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        <div>Loading date...</div>
       </div>
       <div id="times-data"
-           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        <div>Loading date information...</div>
       </div>
       <div id="where-data"
-           class="ui-listview ui-listview-inset ui-corner-all ui-shadow not-displayed">
+           class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        <div>Loading location...</div>
       </div>
 
       <div id="error-msg" class="not-displayed">
       </div>
 
       <button type="button" class="ui-btn ui-mini" id="btnRefresh">Refresh</button>
+    </div>
+
+    <div id="log">
+       
     </div>
 
     <footer data-role="footer" data-position="fixed">

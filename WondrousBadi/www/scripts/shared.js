@@ -292,28 +292,24 @@ function getElementNum(num) {
 
 
 function getFocusTime() {
-  return new Date();
-//  if (!_focusTime) {
-//    _focusTime = new Date();
-//  }
-//
-//  if (isNaN(_focusTime)) {
-//    log('unexpected 1: ', _focusTime);
-//    _focusTime = new Date();
-//  }
-//
-//  return _focusTime;
+  if (!_focusTime) {
+    return new Date();
+  }
+
+  if (isNaN(_focusTime)) {
+    log('unexpected 1: ', _focusTime);
+    return new Date();
+  }
+
+  return _focusTime;
 }
 
-//function setFocusTime(t) {
-//  _focusTime = t || (t = new Date());
-//  if (isNaN(_focusTime)) {
-//    log('unexpected 2: ', _focusTime);
-//  }
-//  setStorage('focusTime', t.getTime());
-//  setStorage('focusTimeAsOf', new Date().getTime());
-//
-//}
+function setFocusTime(t) {
+  _focusTime = t || (t = new Date());
+  if (isNaN(_focusTime)) {
+    log('unexpected 2: ', _focusTime);
+  }
+}
 
 function log() {
   // add a timestamp to console log entries
@@ -328,6 +324,12 @@ function log() {
     }
   }
   console.log.apply(console, a);
+
+  var div = $('#log');
+  if (div) {
+    div.append(`<div>${a.join('')}</div>`);
+  }
+
 }
 
 
@@ -630,17 +632,22 @@ function readFile(locale, fn) {
 
 var _onReadyFn;
 
-function sharedStartup(fn) {
-  _onReadyFn = fn;
+function sharedStartup(fnReady, fnLocationReady) {
+  _onReadyFn = fnReady;
 
   //TODO chain as a promise
   navigator.geolocation.getCurrentPosition(function (position) {
     _locationLat = position.coords.latitude;
     _locationLong = position.coords.longitude;
 
+    fnLocationReady();
+
     loadLocaleInfo();
   }, function (err) {
     console.log(err);
-  }, { enableHighAccuracy: false });
+    }, {
+      enableHighAccuracy: false,
+      maximumAge: 1000 * 60 * 2 // 2 hours
+    });
 
 }
